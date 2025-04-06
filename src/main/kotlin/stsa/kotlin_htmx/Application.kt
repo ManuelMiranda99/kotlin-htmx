@@ -4,6 +4,7 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.compression.*
+import kotlinx.coroutines.runBlocking
 import stsa.kotlin_htmx.models.agent.PostgresAgentRepository
 import stsa.kotlin_htmx.models.crate.PostgresCrateRepository
 import stsa.kotlin_htmx.models.key.PostgresKeyRepository
@@ -63,6 +64,9 @@ fun Application.module() {
     val postgresSkinRepository = PostgresSkinRepository()
     val keyRepository = PostgresKeyRepository()
 
+    runBlocking {
+        configureLoadData(postgresCrateRepository, postgresAgentRepository, postgresSkinRepository, keyRepository)
+    }
     configureBasicAuthentication()
     configureHTTP()
     configureMonitoring()
