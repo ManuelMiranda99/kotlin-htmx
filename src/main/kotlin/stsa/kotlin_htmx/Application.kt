@@ -4,6 +4,11 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.compression.*
+import stsa.kotlin_htmx.models.agent.PostgresAgentRepository
+import stsa.kotlin_htmx.models.crate.PostgresCrateRepository
+import stsa.kotlin_htmx.models.key.PostgresKeyRepository
+import stsa.kotlin_htmx.models.skin.PostgresSkinRepository
+import stsa.kotlin_htmx.plugins.configureDatabase
 import stsa.kotlin_htmx.plugins.configureHTTP
 import stsa.kotlin_htmx.plugins.configureMonitoring
 import stsa.kotlin_htmx.plugins.configureRouting
@@ -55,6 +60,12 @@ fun main() {
 }
 
 fun Application.module() {
+    configureDatabase()
+    val postgresCrateRepository = PostgresCrateRepository()
+    val postgresAgentRepository = PostgresAgentRepository()
+    val postgresSkinRepository = PostgresSkinRepository()
+    val keyRepository = PostgresKeyRepository()
+
     configureHTTP()
     configureMonitoring()
     configureRouting()
@@ -64,5 +75,5 @@ fun Application.module() {
     val config = ApplicationConfig.load()
 
     // Load pages
-    configurePageRoutes()
+    configurePageRoutes(postgresCrateRepository, postgresAgentRepository, postgresSkinRepository, keyRepository)
 }
