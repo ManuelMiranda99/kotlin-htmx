@@ -7,21 +7,15 @@ import io.ktor.server.html.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.util.reflect.*
 import kotlinx.html.*
 import stsa.kotlin_htmx.pages.*
 import stsa.kotlin_htmx.link.pages.LinkMainPage
 import org.slf4j.LoggerFactory
 import stsa.kotlin_htmx.external.CSGOClient
-import stsa.kotlin_htmx.models.agent.Agent
 import stsa.kotlin_htmx.models.agent.AgentRepository
-import stsa.kotlin_htmx.models.crate.Crate
 import stsa.kotlin_htmx.models.crate.CrateRepository
-import stsa.kotlin_htmx.models.key.Key
 import stsa.kotlin_htmx.models.key.KeyRepository
-import stsa.kotlin_htmx.models.skin.Skin
 import stsa.kotlin_htmx.models.skin.SkinRepository
-import stsa.kotlin_htmx.util.CacheManager
 import stsa.kotlin_htmx.util.cacheOrGet
 import stsa.kotlin_htmx.util.generateCacheKey
 
@@ -62,7 +56,7 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                     crateRepository.allCrates()
                 }
 
-                call.respond(result, typeInfo<List<Crate>>())
+                call.respond(result)
             }
 
             get("/search") {
@@ -79,7 +73,7 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                     crateRepository.findBy(id, name, description, image, keys, skins)
                 }
 
-                call.respond(searchResult, typeInfo<List<Crate>>())
+                call.respond(searchResult)
             }
         }
 
@@ -88,7 +82,7 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                 val result = cacheOrGet("skins_all", "all_skins") {
                     skinRepository.allSkins()
                 }
-                call.respond(result, typeInfo<List<Skin>>())
+                call.respond(result)
             }
 
             get("/search") {
@@ -105,7 +99,7 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                     skinRepository.findBy(id, name, description, image, team, crates)
                 }
 
-                call.respond(searchResult, typeInfo<List<Skin>>())
+                call.respond(searchResult)
             }
         }
 
@@ -114,7 +108,7 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                 val result = cacheOrGet("agents_all", "all_agents") {
                     agentRepository.allAgents()
                 }
-                call.respond(result, typeInfo<List<Agent>>())
+                call.respond(result)
             }
 
             get("/search") {
@@ -130,7 +124,7 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                     agentRepository.findBy(id, name, description, team, image)
                 }
 
-                call.respond(searchResult, typeInfo<List<Agent>>())
+                call.respond(searchResult)
             }
         }
 
@@ -140,7 +134,7 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                     val result = cacheOrGet("keys_all", "all_keys") {
                         keyRepository.allKeys()
                     }
-                    call.respond(result, typeInfo<List<Key>>())
+                    call.respond(result)
                 }
 
                 get("/search") {
@@ -156,7 +150,7 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                         keyRepository.findBy(id, name, description, image, crates)
                     }
 
-                    call.respond(searchResult, typeInfo<List<Key>>())
+                    call.respond(searchResult)
                 }
             }
         }
