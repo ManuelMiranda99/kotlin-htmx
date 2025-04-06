@@ -21,6 +21,9 @@ import stsa.kotlin_htmx.models.key.Key
 import stsa.kotlin_htmx.models.key.KeyRepository
 import stsa.kotlin_htmx.models.skin.Skin
 import stsa.kotlin_htmx.models.skin.SkinRepository
+import stsa.kotlin_htmx.util.CacheManager
+import stsa.kotlin_htmx.util.cacheOrGet
+import stsa.kotlin_htmx.util.generateCacheKey
 
 private val logger = LoggerFactory.getLogger("stsa.kotlin_htmx.Routes")
 
@@ -55,7 +58,10 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
 
         route("/crates") {
             get {
-                val result = crateRepository.allCrates()
+                val result = cacheOrGet("crates_all", "all_crates") {
+                    crateRepository.allCrates()
+                }
+
                 call.respond(result, typeInfo<List<Crate>>())
             }
 
@@ -67,14 +73,11 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                 val keys = call.request.queryParameters["keys"]
                 val skins = call.request.queryParameters["skins"]
 
-                val searchResult = crateRepository.findBy(
-                    id,
-                    name,
-                    description,
-                    image,
-                    keys,
-                    skins
-                )
+                val cacheKey = generateCacheKey(id, name, description, image, keys, skins)
+
+                val searchResult = cacheOrGet("crates_search", cacheKey) {
+                    crateRepository.findBy(id, name, description, image, keys, skins)
+                }
 
                 call.respond(searchResult, typeInfo<List<Crate>>())
             }
@@ -82,7 +85,9 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
 
         route("/skins") {
             get {
-                val result = skinRepository.allSkins()
+                val result = cacheOrGet("skins_all", "all_skins") {
+                    skinRepository.allSkins()
+                }
                 call.respond(result, typeInfo<List<Skin>>())
             }
 
@@ -94,14 +99,11 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                 val team = call.request.queryParameters["team"]
                 val crates = call.request.queryParameters["crates"]
 
-                val searchResult = skinRepository.findBy(
-                    id,
-                    name,
-                    description,
-                    image,
-                    team,
-                    crates
-                )
+                val cacheKey = generateCacheKey(id, name, description, image, team, crates)
+
+                val searchResult = cacheOrGet("skins_search", cacheKey) {
+                    skinRepository.findBy(id, name, description, image, team, crates)
+                }
 
                 call.respond(searchResult, typeInfo<List<Skin>>())
             }
@@ -109,7 +111,9 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
 
         route("/agents") {
             get {
-                val result = agentRepository.allAgents()
+                val result = cacheOrGet("agents_all", "all_agents") {
+                    agentRepository.allAgents()
+                }
                 call.respond(result, typeInfo<List<Agent>>())
             }
 
@@ -120,13 +124,11 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                 val team = call.request.queryParameters["team"]
                 val image = call.request.queryParameters["image"]
 
-                val searchResult = agentRepository.findBy(
-                    id,
-                    name,
-                    description,
-                    team,
-                    image
-                )
+                val cacheKey = generateCacheKey(id, name, description, team, image)
+
+                val searchResult = cacheOrGet("agents_search", cacheKey) {
+                    agentRepository.findBy(id, name, description, team, image)
+                }
 
                 call.respond(searchResult, typeInfo<List<Agent>>())
             }
@@ -135,17 +137,24 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
         authenticate("auth-basic") {
             route("/keys") {
                 get {
-                    val result = keyRepository.allKeys()
+                    val result = cacheOrGet("keys_all", "all_keys") {
+                        keyRepository.allKeys()
+                    }
                     call.respond(result, typeInfo<List<Key>>())
                 }
 
                 get("/search") {
-                    val searchValue = call.request.queryParameters["query"]
-                    if (searchValue == null) {
-                        return@get call.respond(mapOf("error" to "Query parameter is missing"), typeInfo<Map<String, String>>())
-                    }
+                    val id = call.request.queryParameters["id"]
+                    val name = call.request.queryParameters["name"]
+                    val description = call.request.queryParameters["description"]
+                    val image = call.request.queryParameters["image"]
+                    val crates = call.request.queryParameters["crates"]
 
-                    val searchResult = keyRepository.findBy(searchValue)
+                    val cacheKey = generateCacheKey(id, name, description, image, crates)
+
+                    val searchResult = cacheOrGet("keys_search", cacheKey) {
+                        keyRepository.findBy(id, name, description, image, crates)
+                    }
 
                     call.respond(searchResult, typeInfo<List<Key>>())
                 }

@@ -1,8 +1,6 @@
 package stsa.kotlin_htmx.models.key
 
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.or
-import stsa.kotlin_htmx.models.CrateKey.CrateKeyTable
 import stsa.kotlin_htmx.models.suspendTransaction
 
 class PostgresKeyRepository: KeyRepository {
@@ -27,8 +25,7 @@ class PostgresKeyRepository: KeyRepository {
             (KeyTable.id like "%$id%") or
             (KeyTable.name like "%$name%") or
             (KeyTable.description like "%$description%") or
-            (KeyTable.image like "%$image%") or
-            ((CrateKeyTable.key eq KeyTable.id) and (CrateKeyTable.crate eq crates))
+            (KeyTable.image like "%$image%")
         }.map(::daoToKeyModel)
     }
 }

@@ -52,8 +52,8 @@ private suspend fun loadSkins(csgoClient: CSGOClient, skinRepository: SkinReposi
                     id =  skin.id,
                     name = skin.name,
                     description = skin.description,
-                    team = skin.team.name,
                     image = skin.image,
+                    team = skin.team.name,
                     crates = emptyList()
                 )
             )
