@@ -1,0 +1,19 @@
+version: "3.3"
+services:
+  kotlin-htmx:
+    build: .
+    container_name: kotlin-htmx
+    ports:
+      - "8080:8080"
+  postgres:
+    image: 'postgres'
+    container_name: postgres_db_kotlin_htmx
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: csgo_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:

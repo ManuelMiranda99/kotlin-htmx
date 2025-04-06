@@ -13,7 +13,7 @@ import stsa.kotlin_htmx.models.skin.SkinTable
 
 fun Application.configureDatabase() {
     Database.connect(
-        "jdbc:postgresql://localhost:5432/my_database",
+        "jdbc:postgresql://postgres:5432/csgo_db",
         user = "admin",
         password = "secret"
     )
