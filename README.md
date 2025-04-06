@@ -107,3 +107,8 @@ Allows filtering keys by various properties using query parameters:
 ```
 GET http://localhost:8080/keys/search?id={ID}&name={NAME}&description={DESCRIPTION}&image={IMAGE}
 ```
+
+## Additional Notes
+
+- To receive a XML response, send an Accept: application/xml header.
+- I used Caffeine to manage cache
