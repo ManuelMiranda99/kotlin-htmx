@@ -76,6 +76,9 @@ dependencies {
 
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
+    implementation("io.ktor:ktor-serialization-kotlinx-xml:$ktorVersion")
+
     testImplementation("org.assertj:assertj-core:3.26.3")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")

@@ -1,6 +1,9 @@
 package stsa.kotlin_htmx
 
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import io.ktor.http.*
 import io.ktor.serialization.jackson.*
+import io.ktor.serialization.kotlinx.xml.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.html.*
@@ -25,7 +28,8 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
     val csgoClient = CSGOClient()
 
     install(ContentNegotiation) {
-        jackson()
+        jackson(ContentType.Application.Json) { registerKotlinModule() }
+        xml()
     }
 
     routing {
@@ -157,7 +161,7 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
 
         route("/xml") {
             get {
-                call.respondText("OK")
+                call.respondText("OK", contentType = ContentType.Text.Xml)
             }
         }
     }
