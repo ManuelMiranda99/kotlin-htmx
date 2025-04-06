@@ -24,8 +24,10 @@ class ApplicationTest {
         client.get("/keys").apply {
             assertEquals(HttpStatusCode.Unauthorized, status)
         }
-        //TODO: <-- YOUR CODE HERE -> Use an authenticated client
-        client.get("/keys").apply {
+
+        client.get("/keys"){
+            headers.append(HttpHeaders.Authorization, "Basic YWRtaW46cGFzc3dvcmQ=")
+        }.apply {
             assertEquals(HttpStatusCode.OK, status)
         }
     }

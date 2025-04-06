@@ -34,6 +34,6 @@ fun daoToCrateModel(dao: CrateDAO) = Crate(
     name = dao.name,
     description = dao.description,
     image = dao.image,
-    keys = dao.keys.map { daoToKeyModel(it) },
-    skins = dao.skins.map { daoToSkinModel(it) }
+    keys = dao.keys.map { it.name },
+    skins = dao.skins.map { it.name }
 )

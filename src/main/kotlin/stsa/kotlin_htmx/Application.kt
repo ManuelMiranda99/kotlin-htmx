@@ -8,10 +8,7 @@ import stsa.kotlin_htmx.models.agent.PostgresAgentRepository
 import stsa.kotlin_htmx.models.crate.PostgresCrateRepository
 import stsa.kotlin_htmx.models.key.PostgresKeyRepository
 import stsa.kotlin_htmx.models.skin.PostgresSkinRepository
-import stsa.kotlin_htmx.plugins.configureDatabase
-import stsa.kotlin_htmx.plugins.configureHTTP
-import stsa.kotlin_htmx.plugins.configureMonitoring
-import stsa.kotlin_htmx.plugins.configureRouting
+import stsa.kotlin_htmx.plugins.*
 import java.io.File
 
 data class ApplicationConfig(
@@ -66,6 +63,7 @@ fun Application.module() {
     val postgresSkinRepository = PostgresSkinRepository()
     val keyRepository = PostgresKeyRepository()
 
+    configureBasicAuthentication()
     configureHTTP()
     configureMonitoring()
     configureRouting()

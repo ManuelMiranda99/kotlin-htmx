@@ -2,6 +2,7 @@ package stsa.kotlin_htmx
 
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.html.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.routing.*
@@ -70,6 +71,26 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                 val result = crateRepository.allCrates()
                 call.respond(result, typeInfo<List<Crate>>())
             }
+
+            get("/search") {
+                val id = call.request.queryParameters["id"]
+                val name = call.request.queryParameters["name"]
+                val description = call.request.queryParameters["description"]
+                val image = call.request.queryParameters["image"]
+                val keys = call.request.queryParameters["keys"]
+                val skins = call.request.queryParameters["skins"]
+
+                val searchResult = crateRepository.findBy(
+                    id,
+                    name,
+                    description,
+                    image,
+                    keys,
+                    skins
+                )
+
+                call.respond(searchResult, typeInfo<List<Crate>>())
+            }
         }
 
         route("/skins") {
@@ -104,6 +125,26 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                 val result = skinRepository.allSkins()
                 call.respond(result, typeInfo<List<Skin>>())
             }
+
+            get("/search") {
+                val id = call.request.queryParameters["id"]
+                val name = call.request.queryParameters["name"]
+                val description = call.request.queryParameters["description"]
+                val image = call.request.queryParameters["image"]
+                val team = call.request.queryParameters["team"]
+                val crates = call.request.queryParameters["crates"]
+
+                val searchResult = skinRepository.findBy(
+                    id,
+                    name,
+                    description,
+                    image,
+                    team,
+                    crates
+                )
+
+                call.respond(searchResult, typeInfo<List<Skin>>())
+            }
         }
 
         route("/agents") {
@@ -130,38 +171,69 @@ fun Application.configurePageRoutes(crateRepository: CrateRepository, agentRepos
                 val result = agentRepository.allAgents()
                 call.respond(result, typeInfo<List<Agent>>())
             }
+
+            get("/search") {
+                val id = call.request.queryParameters["id"]
+                val name = call.request.queryParameters["name"]
+                val description = call.request.queryParameters["description"]
+                val team = call.request.queryParameters["team"]
+                val image = call.request.queryParameters["image"]
+
+                val searchResult = agentRepository.findBy(
+                    id,
+                    name,
+                    description,
+                    team,
+                    image
+                )
+
+                call.respond(searchResult, typeInfo<List<Agent>>())
+            }
         }
 
-        route("/keys") {
-            post {
-                when (val result = csgoClient.getKeys()) {
-                    is Result.Error -> call.respond(mapOf("error" to result.error.name), typeInfo<Map<String, String>>())
-                    is Result.Success -> {
-                        result.data.forEach{key ->
-                            keyRepository.addKey(Key(
-                                id = key.id,
-                                name = key.name,
-                                description = key.description,
-                                image = key.image,
-                                crates = emptyList()
-                            ))
+        authenticate("auth-basic") {
+            route("/keys") {
+                post {
+                    when (val result = csgoClient.getKeys()) {
+                        is Result.Error -> call.respond(mapOf("error" to result.error.name), typeInfo<Map<String, String>>())
+                        is Result.Success -> {
+                            result.data.forEach{key ->
+                                keyRepository.addKey(Key(
+                                    id = key.id,
+                                    name = key.name,
+                                    description = key.description,
+                                    image = key.image,
+                                    crates = emptyList()
+                                ))
 
-                            key.crates.forEach{crate ->
-                                crateRepository.insertCrateKeyRelation(
-                                    crateId = crate.id,
-                                    keyId = key.id
-                                )
+                                key.crates.forEach{crate ->
+                                    crateRepository.insertCrateKeyRelation(
+                                        crateId = crate.id,
+                                        keyId = key.id
+                                    )
+                                }
                             }
-                        }
 
-                        call.respond(mapOf("data" to "success"), typeInfo<Map<String, String>>())
+                            call.respond(mapOf("data" to "success"), typeInfo<Map<String, String>>())
+                        }
                     }
                 }
-            }
 
-            get {
-                val result = keyRepository.allKeys()
-                call.respond(result, typeInfo<List<Key>>())
+                get {
+                    val result = keyRepository.allKeys()
+                    call.respond(result, typeInfo<List<Key>>())
+                }
+
+                get("/search") {
+                    val searchValue = call.request.queryParameters["query"]
+                    if (searchValue == null) {
+                        return@get call.respond(mapOf("error" to "Query parameter is missing"), typeInfo<Map<String, String>>())
+                    }
+
+                    val searchResult = keyRepository.findBy(searchValue)
+
+                    call.respond(searchResult, typeInfo<List<Key>>())
+                }
             }
         }
     }

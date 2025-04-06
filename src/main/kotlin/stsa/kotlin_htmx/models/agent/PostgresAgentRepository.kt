@@ -1,6 +1,7 @@
 package stsa.kotlin_htmx.models.agent
 
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.transactions.transaction
 import stsa.kotlin_htmx.models.suspendTransaction
 
@@ -18,5 +19,21 @@ class PostgresAgentRepository: AgentRepository {
             team = agent.team
             image = agent.image
         }
+    }
+
+    override suspend fun findBy(
+        id: String?,
+        name: String?,
+        description: String?,
+        team: String?,
+        image: String?
+    ): List<Agent> = suspendTransaction {
+        AgentDAO.find {
+            (AgentTable.id like "%$id%") or
+            (AgentTable.name like "%$name%") or
+            (AgentTable.description like "%$description%") or
+            (AgentTable.team like "%$team%") or
+            (AgentTable.image like "%$image%")
+        }.map(::daoToAgentModel)
     }
 }

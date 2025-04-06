@@ -12,6 +12,6 @@ data class Crate(
     val name: String,
     val description: String?,
     val image: String,
-    val keys: List<Key> = emptyList(),
-    val skins: List<Skin> = emptyList()
+    val keys: List<String> = emptyList(),
+    val skins: List<String> = emptyList()
 )
